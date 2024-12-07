@@ -30,8 +30,14 @@ export interface ModelInfo {
 export interface ProviderInfo {
   staticModels: ModelInfo[];
   name: string;
-  getDynamicModels?: () => Promise<ModelInfo[]>;
+  getDynamicModels?: (apikey?: string) => Promise<ModelInfo[]>;
   getApiKeyLink?: string;
   labelForGetApiKey?: string;
   icon?: string;
+}
+
+export interface ModelConfig {
+  apiKey?: string | null;
+  model?: ModelInfo | null;
+  provider: string;
 }

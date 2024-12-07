@@ -1,12 +1,9 @@
-import Cookies from 'js-cookie';
 import type { ModelInfo, OllamaApiResponse, OllamaModel } from './types';
 import type { ProviderInfo } from '~/types/model';
 
 export const WORK_DIR_NAME = 'project';
 export const WORK_DIR = `/home/${WORK_DIR_NAME}`;
 export const MODIFICATIONS_TAG_NAME = 'bolt_file_modifications';
-export const MODEL_REGEX = /^\[Model: (.*?)\]\n\n/;
-export const PROVIDER_REGEX = /\[Provider: (.*?)\]\n\n/;
 export const DEFAULT_MODEL = 'claude-3-5-sonnet-latest';
 export const PROMPT_COOKIE_KEY = 'cachedPrompt';
 
@@ -295,21 +292,7 @@ const staticModels: ModelInfo[] = PROVIDER_LIST.map((p) => p.staticModels).flat(
 
 export let MODEL_LIST: ModelInfo[] = [...staticModels];
 
-export async function getModelList(apiKeys: Record<string, string>) {
-  MODEL_LIST = [
-    ...(
-      await Promise.all(
-        PROVIDER_LIST.filter(
-          (p): p is ProviderInfo & { getDynamicModels: () => Promise<ModelInfo[]> } => !!p.getDynamicModels,
-        ).map((p) => p.getDynamicModels(apiKeys)),
-      )
-    ).flat(),
-    ...staticModels,
-  ];
-  return MODEL_LIST;
-}
-
-async function getTogetherModels(apiKeys?: Record<string, string>): Promise<ModelInfo[]> {
+async function getTogetherModels(apiKey?: string): Promise<ModelInfo[]> {
   try {
     const baseUrl = import.meta.env.TOGETHER_API_BASE_URL || '';
     const provider = 'Together';
@@ -318,11 +301,7 @@ async function getTogetherModels(apiKeys?: Record<string, string>): Promise<Mode
       return [];
     }
 
-    let apiKey = import.meta.env.OPENAI_LIKE_API_KEY ?? '';
-
-    if (apiKeys && apiKeys[provider]) {
-      apiKey = apiKeys[provider];
-    }
+    apiKey ||= import.meta.env.OPENAI_LIKE_API_KEY ?? '';
 
     if (!apiKey) {
       return [];
@@ -345,7 +324,7 @@ async function getTogetherModels(apiKeys?: Record<string, string>): Promise<Mode
       maxTokenAllowed: 8000,
     }));
   } catch (e) {
-    console.error('Error getting OpenAILike models:', e);
+    console.error('Error getting Together models:', e);
     return [];
   }
 }
@@ -389,7 +368,7 @@ async function getOllamaModels(): Promise<ModelInfo[]> {
   }
 }
 
-async function getOpenAILikeModels(): Promise<ModelInfo[]> {
+async function getOpenAILikeModels(apiKey?: string): Promise<ModelInfo[]> {
   try {
     const baseUrl = import.meta.env.OPENAI_LIKE_API_BASE_URL || '';
 
@@ -397,13 +376,7 @@ async function getOpenAILikeModels(): Promise<ModelInfo[]> {
       return [];
     }
 
-    let apiKey = import.meta.env.OPENAI_LIKE_API_KEY ?? '';
-
-    const apikeys = JSON.parse(Cookies.get('apiKeys') || '{}');
-
-    if (apikeys && apikeys.OpenAILike) {
-      apiKey = apikeys.OpenAILike;
-    }
+    apiKey ||= import.meta.env.OPENAI_LIKE_API_KEY ?? '';
 
     const response = await fetch(`${baseUrl}/models`, {
       headers: {
@@ -478,32 +451,7 @@ async function getLMStudioModels(): Promise<ModelInfo[]> {
 }
 
 async function initializeModelList(): Promise<ModelInfo[]> {
-  let apiKeys: Record<string, string> = {};
-
-  try {
-    const storedApiKeys = Cookies.get('apiKeys');
-
-    if (storedApiKeys) {
-      const parsedKeys = JSON.parse(storedApiKeys);
-
-      if (typeof parsedKeys === 'object' && parsedKeys !== null) {
-        apiKeys = parsedKeys;
-      }
-    }
-  } catch (error: any) {
-    console.warn(`Failed to fetch apikeys from cookies:${error?.message}`);
-  }
-  MODEL_LIST = [
-    ...(
-      await Promise.all(
-        PROVIDER_LIST.filter(
-          (p): p is ProviderInfo & { getDynamicModels: () => Promise<ModelInfo[]> } => !!p.getDynamicModels,
-        ).map((p) => p.getDynamicModels(apiKeys)),
-      )
-    ).flat(),
-    ...staticModels,
-  ];
-
+  MODEL_LIST = [...staticModels];
   return MODEL_LIST;
 }
 
