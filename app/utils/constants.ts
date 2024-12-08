@@ -146,6 +146,12 @@ const PROVIDER_LIST: ProviderInfo[] = [
     name: 'HuggingFace',
     staticModels: [
       {
+        name: 'Qwen/QwQ-32B-Preview',
+        label: 'QwQ-32B-Preview (HuggingFace)',
+        provider: 'HuggingFace',
+        maxTokenAllowed: 8000,
+      },      
+      {
         name: 'Qwen/Qwen2.5-Coder-32B-Instruct',
         label: 'Qwen2.5-Coder-32B-Instruct (HuggingFace)',
         provider: 'HuggingFace',
@@ -166,12 +172,6 @@ const PROVIDER_LIST: ProviderInfo[] = [
       {
         name: 'NousResearch/Hermes-3-Llama-3.1-8B',
         label: 'Hermes-3-Llama-3.1-8B (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'Qwen/Qwen2.5-Coder-32B-Instruct',
-        label: 'Qwen2.5-Coder-32B-Instruct (HuggingFace)',
         provider: 'HuggingFace',
         maxTokenAllowed: 8000,
       },
@@ -192,29 +192,10 @@ const PROVIDER_LIST: ProviderInfo[] = [
         label: 'Llama-3.1-405B (HuggingFace)',
         provider: 'HuggingFace',
         maxTokenAllowed: 8000,
-      },
-      {
-        name: '01-ai/Yi-1.5-34B-Chat',
-        label: 'Yi-1.5-34B-Chat (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'codellama/CodeLlama-34b-Instruct-hf',
-        label: 'CodeLlama-34b-Instruct (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'NousResearch/Hermes-3-Llama-3.1-8B',
-        label: 'Hermes-3-Llama-3.1-8B (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
+      }
     ],
     getApiKeyLink: 'https://huggingface.co/settings/tokens',
   },
-
   {
     name: 'OpenAI',
     staticModels: [
@@ -366,12 +347,6 @@ const getOllamaBaseUrl = () => {
 };
 
 async function getOllamaModels(): Promise<ModelInfo[]> {
-  /*
-   * if (typeof window === 'undefined') {
-   * return [];
-   * }
-   */
-
   try {
     const baseUrl = getOllamaBaseUrl();
     const response = await fetch(`${baseUrl}/api/tags`);
