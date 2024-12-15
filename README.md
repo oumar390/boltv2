@@ -39,6 +39,7 @@ https://thinktank.ottomator.ai
 - ✅ Better prompt enhancing (@SujalXplores)
 - ✅ Prompt caching (@SujalXplores)
 - ✅ Load local projects into the app (@wonderwhy-er)
+- ✅ Chat history backup and restore functionality (@sidbetatester)
 - ✅ Together Integration (@mouimet-infinisoft)
 - ✅ Mobile friendly (@qwikode)
 - ✅ Better prompt enhancing (@SujalXplores)
